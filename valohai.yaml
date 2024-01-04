@@ -1,0 +1,92 @@
+- step:
+    name: preprocess-dataset
+    image: docker.io/noorai/dynamic-pipelines-demo:0.1
+    environment: staging-aws-eu-west-1-g4dn-xlarge
+    command:
+    - python ./preprocess.py
+    inputs:
+      - name: dataset
+        default: s3://valohai-demo-library-data/dynamic-pipelines/train/images.zip
+      - name: labels
+        default: s3://valohai-demo-library-data/dynamic-pipelines/train/*.csv 
+    parameters:
+        - name: dataset_names
+          default: [harbor_A]
+          type: string
+          multiple: separate
+          multiple-separator: ','
+          optional: false
+        - name: validation_split
+          default: 0.3
+          type: float
+
+- step:
+    name: train-model
+    image: docker.io/noorai/dynamic-pipelines-demo:0.1
+    environment: staging-aws-eu-west-1-g4dn-xlarge
+    command:
+    - python ./train_model.py {parameters}
+    parameters:
+      - name: epochs
+        default: 25
+        type: integer
+      - name: learning_rate
+        default: 0.001
+        type: float
+      - name: batch_size
+        default: 64
+        type: integer
+      - name: dataset_name
+        optional: true
+    inputs:
+      - name: dataset
+        default: dataset://{parameter:dataset_name}_train/latest
+        optional: true
+
+- step:
+    name: predict
+    image: docker.io/noorai/dynamic-pipelines-demo:0.1
+    environment: staging-aws-eu-west-1-g4dn-xlarge
+    command:
+    - python ./predict.py
+    parameters:
+        - name: dataset_names
+          default: [all_harbors]
+          type: string
+          multiple: separate
+          multiple-separator: ','
+          optional: false
+    inputs:
+    - name: model
+    - name: test_dataset
+      keep-directories: "suffix"
+
+- pipeline:
+    name: training-pipeline
+    parameters:
+      - name: dataset
+        targets:
+          - preprocess.parameter.dataset_names
+          - predictions.parameter.dataset_names
+        default: [all_harbors, harbor_A]
+    nodes:
+      - name: preprocess
+        type: execution
+        step: preprocess-dataset
+      - name: train
+        type: task
+        step: train-model
+      - name: predictions
+        type: execution
+        step: predict
+        actions:
+          - when: node-starting
+            then: require-approval
+        override:
+          inputs:
+            - name: test_dataset
+            - name: model
+    edges:
+      - [preprocess.metadata.run_training_for, train.parameter.dataset_name]
+      - [preprocess.output.test/*, predictions.input.test_dataset]
+      - [train.output.*.h5, predictions.input.model]
