@@ -1,59 +1,244 @@
-# Launch a collection of pipelines for different models in Valohai
+# Harbor Vessel Detection
 
-This demo shows how to easily
-- Run hyperparameter tuning as a part of a pipeline
-- Scale pipelines to train the same model on different datasets
+This project is designed to detect different types of ships and vessels from aerial images using computer vision techniques. The project involves three main steps: preprocessing, training, and prediction. This README provides instructions to get started with running the project on AWS and using MLFlow for experiment tracking. Additionally, it includes guidelines for creating an Airflow pipeline to automate the entire process.
 
-## When to use this demo
-The customer wants to:
-- Retrain their model for different contexts (multiple patients, devices, vehicles..)
-    - "We have a model built, that is trained for device xyz123, but now we have to fit the model for 100s of other devices"
-- Run parallel steps, e.g. hyperparameter tuning, inside a pipeline
-- Train the model for different environments (e.g. edge, online, mobile...) or compare multiple variations of the model in a pipeline
+## Prerequisites
+- AWS account with access to S3 and EC2
+- Python 3.8+
+- AWS CLI
+- Boto3
+- MLFlow
+- Apache Airflow
 
-## When not to use this demo
-The customer:
-- Has heavy focus on exploration using notebooks and doesn't use an IDE or benefit from dividing their work into separate pure Python scripts that could be combined into a pipeline.
-- Doesn't need to take their work into production or cannot define who/what will use their model.
+## Setup Instructions
 
-## Video
+### Setup AWS CLI, Boto3, and Airflow
+1. **Install AWS CLI:**
+    ```bash
+    sudo apt-get install awscli
+    ```
 
-*video content*
+2. **Install Boto3:**
+    ```bash
+    pipx install boto3
+    ```
 
-## How to demo?
-- Start by showing a completed pipeline and talking about the fundamentals.
-    - See the cheat sheet below.  
-- Go to the YAML file in Github and show the pipeline, mention that you will share it after the call. 
-    - DISCLAIMER: If the audience consists mainly of ML / DevOps directors or the likes, it makes sense to skip showing the YAML to avoid making Valohai feel complicated. 
-- Back in the UI, show how to create parallel pipelines by using the pipeline level parameters.
-    - Change the value of the pipeline parameter called "dataset". Available values:
-        - all_harbors
-        - harbor_A
-        - harbor_B
-        - harbor_C
-- Open the preprocess node and show how to change inputs.
-- Open the train node and show how to change the parameter values.
-- Show how to create a trigger to run the pipeline for production runs (hourly, daily, monthly, etc.)
+3. **Install Airflow:**
+    ```bash
+    pipx install apache-airflow
+    ```
 
-### Fundamentals cheat sheet
-- Each node is "individual and isolated", i.e. they run on individual machines and in isolated Docker containers. 
-- Each node can run on the same instance type or you can select different type for each node if needed (e.g. CPU vs GPU workloads), Valohai will handle scaling the right machine.
-- Each node is versioned: information about the environment (machine and Docker image), inputs, parameters, who ran the job...
-- Valohai versions the outputs of each node, and handles passing them as inputs to the next nodes 
-    - Valohai handles authentication, authorization, downloading and caching of input files. You will only need to tell it which files you want available in your job.
-    - From your codes point of view all these files are local.
-- We’re using datasets that have a collection of images. 
-    - You can show images from Details tab: Click on the eye symbol for the input to show the preview.
-        - Note that this requires using `s3://valohai-demo-library-data/dynamic-pipelines/train/images/*` as the input for preprocessing node, default is a .zip file. 
-- Valohai has a dataset function, a versioned collection of files with human readable names, easy to share across team and update (code, or UI). 
-    - Even if we use “latest” Valohai will version the exact files that were pulled with the data store URLs, it won’t just say “latest” under the Details page.
-    - Dataset is used as an input in the train node.
-- Parameters are either hyperparamerts, or any configuration value (e.g. ship id, patient id)
-    - We can easily then run multiple pipelines with a collection of these different parameters (100 ships ⇒ 100 pipelines) or dynamically scale up/down our pipeline to say (1 pipeline but the number of jobs inside it will depend on number of ships). Just depends do you want to isolate each job or fan out/in all jobs.
-- Metadata can be used for graphing purposes or for edge conditioning (stop pipeline if metadata exceeds certain value).
-    - See train node, plot for example epoch vs accuracy and/or loss.
+### Request Access to S3 Bucket
+To access the test dataset stored in an S3 bucket, request access by submitting a JIRA ticket
 
+Generate temporary credentials using the AWS Security Token Service (STS) and configure Boto3.
 
-## Acknowledgements
-The example here is based on the Ship classification Notebook by [Arpit Jain](https://www.kaggle.com/code/arpitjain007/ship-classification/notebook). 
-- The dataset is available [here](https://www.kaggle.com/datasets/arpitjain007/game-of-deep-learning-ship-datasets).
+1. **Generate Temporary Credentials:**
+    ```bash
+    aws sts get-session-token --duration-seconds 36000
+    ```
+
+2. **Configure Boto3:**
+    ```python
+    import boto3
+
+    session = boto3.Session(
+        aws_access_key_id='YOUR_ACCESS_KEY',
+        aws_secret_access_key='YOUR_SECRET_KEY',
+        aws_session_token='YOUR_SESSION_TOKEN'
+    )
+    s3 = session.resource('s3')
+    ```
+
+### Provision an EC2 GPU Machine
+1. **Launch an EC2 Instance:**
+    - Choose an instance type with GPU (e.g., `p3.2xlarge`).
+    - Configure security group and key pair.
+        - Remember to allow access to port 22 from our internal network.
+
+2. **Connect to the Instance:**
+    ```bash
+    ssh -i "your-key-pair.pem" ec2-user@your-ec2-instance-public-dns
+    ```
+![AWS EC2](images/aws_ec2.png)
+
+### Clone the Repository
+1. **Install Git:**
+    ```bash
+    sudo yum install git -y
+    ```
+
+2. **Clone the Repository:**
+    ```bash
+    git clone https://github.com/your-username/harbor-object-detection.git
+    cd harbor-object-detection
+    ```
+
+> Remember to commit your changes to Git periodically!
+
+> Remember to shut down the machine, when you no longer needed!
+
+### Setup MLFlow
+1. **Check for Existing MLFlow Server:**
+   Before setting up a new MLFlow server, check with your team if there is already a shared MLFlow server available.
+
+2. **Setup MLFlow Server on a Separate EC2 Instance:**
+
+    1. **Launch an EC2 Instance:**
+        - Choose an instance type (e.g., `t2.medium`).
+        - Configure security group and key pair.
+
+    2. **Connect to the Instance:**
+        ```bash
+        ssh -i "your-key-pair.pem" ec2-user@your-mlflow-instance-public-dns
+        ```
+
+    3. **Install Dependencies:**
+        ```bash
+        sudo yum install git -y
+        sudo yum install -y python3
+        pip3 install mlflow boto3
+        ```
+
+    4. **Clone the Repository (optional, if you want to manage from the same repo):**
+        ```bash
+        git clone https://github.com/your-username/harbor-object-detection.git
+        cd harbor-object-detection
+        ```
+
+    5. **Configure MLFlow Tracking:**
+
+        > Request seperate authentication credentials for this, so you're not passing your personal access keys!
+
+        ```bash
+        export MLFLOW_S3_ENDPOINT_URL=https://s3.amazonaws.com
+        export AWS_ACCESS_KEY_ID=your-access-key-id
+        export AWS_SECRET_ACCESS_KEY=your-secret-access-key
+        export MLFLOW_TRACKING_URI=http://your-mlflow-server:5000
+        ```
+
+    6. **Start MLFlow Server:**
+        ```bash
+        mlflow server \
+          --backend-store-uri sqlite:///mlflow.db \
+          --default-artifact-root s3://your-s3-bucket/mlflow/ \
+          --host 0.0.0.0
+        ```
+
+3. **Configure KMS Key for S3 Backend:**
+    Ensure that your S3 bucket is configured to use a KMS key for encryption. Add the KMS key configuration to your `.env` file:
+    ```bash
+    export MLFLOW_S3_ENCRYPTION_KEY=your-kms-key-id
+    ```
+
+![MLFlow](images/mlflow.png)
+
+## Running the Project
+
+### Preprocessing
+```bash
+python preprocessing.py --csv_path data/raw/labels.csv --images_path data/raw/images.zip --output_path data/processed/dataset.npz
+```
+
+### Training
+```bash
+python training.py --input_path data/processed/dataset.npz --epochs 50 --learning_rate 0.001 --batch_size 32 --dataset_name harbor_dataset
+```
+
+### Prediction
+```bash
+python prediction.py --model_path models/harbor_model.h5 --test_data data/processed/dataset_test.npz --output_path predictions/
+```
+
+## Save Artifacts to S3 via MLFlow
+1. **Log Artifacts:**
+    ```python
+    import mlflow
+
+    with mlflow.start_run():
+        mlflow.log_param("epochs", 50)
+        mlflow.log_param("learning_rate", 0.001)
+        mlflow.log_artifact("models/harbor_model.h5")
+        mlflow.log_artifact("predictions/")
+    ```
+
+2. **Save Model to S3:**
+    ```bash
+    mlflow artifacts download -r your-run-id -o s3://your-s3-bucket/mlflow-artifacts/
+    ```
+
+## Airflow Pipeline
+
+![Airflow](images/airflow.png)
+
+### Define the Pipeline
+1. **Install Airflow:**
+    ```bash
+    pipx install apache-airflow
+    ```
+
+2. **Create a DAG:**
+    ```python
+    from airflow import DAG
+    from airflow.operators.python_operator import PythonOperator
+    from datetime import datetime
+    import boto3
+    import os
+
+    def download_data():
+        s3 = boto3.client('s3')
+        s3.download_file('your-s3-bucket', 'data/raw/labels.csv', '/path/to/labels.csv')
+        s3.download_file('your-s3-bucket', 'data/raw/images.zip', '/path/to/images.zip')
+
+    def preprocess():
+        import subprocess
+        subprocess.run(["python", "preprocessing.py", "--csv_path", "/path/to/labels.csv", "--images_path", "/path/to/images.zip", "--output_path", "data/processed/dataset.npz"])
+
+    def train():
+        import subprocess
+        subprocess.run(["python", "training.py", "--input_path", "data/processed/dataset.npz", "--epochs", "50", "--learning_rate", "0.001", "--batch_size", "32", "--dataset_name", "harbor_dataset"])
+
+    def predict():
+        import subprocess
+        subprocess.run(["python", "prediction.py", "--model_path", "models/harbor_model.h5", "--test_data", "data/processed/dataset_test.npz", "--output_path", "predictions/"])
+
+    default_args = {
+        'owner': 'airflow',
+        'start_date': datetime(2023, 1, 1),
+        'retries': 1,
+    }
+
+    dag = DAG('harbor_detection_pipeline', default_args=default_args, schedule_interval='@daily')
+
+    download_task = PythonOperator(
+        task_id='download_data',
+        python_callable=download_data,
+        dag=dag,
+    )
+
+    preprocess_task = PythonOperator(
+        task_id='preprocess',
+        python_callable=preprocess,
+        dag=dag,
+    )
+
+    train_task = PythonOperator(
+        task_id='train',
+        python_callable=train,
+        dag=dag,
+    )
+
+    predict_task = PythonOperator(
+        task_id='predict',
+        python_callable=predict,
+        dag=dag,
+    )
+
+    download_task >> preprocess_task >> train_task >> predict_task
+    ```
+
+3. **Deploy the DAG:**
+    - Save the DAG file (e.g., `harbor_detection_dag.py`) to the Airflow DAGs folder.
+    - Start the Airflow web server and scheduler.
+
+By following these instructions, you can set up and run the Harbor Object Detection Project on AWS with MLFlow tracking and automate the workflow using Airflow.
