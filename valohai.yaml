@@ -57,8 +57,6 @@
       - name: debug
         type: flag
         default: false
-        pass-true-as: --debug=True
-        pass-false-as: --debug=False
     inputs:
       - name: dataset
         default: dataset://{parameter:dataset_name}_train/latest
