@@ -104,7 +104,7 @@ def main():
     dataset_name = dataset_name
     output_path = os.path.join(output_dir_path, f"model-" + dataset_name + ".h5")
     model.save(output_path)
-    print("Save completed")
+    print("Saved completed artefacts to outputs")
 
 if __name__ == '__main__':
     main()
