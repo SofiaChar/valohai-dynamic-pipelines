@@ -27,13 +27,13 @@ def log_metadata(epoch, logs):
     }))
 
 def main():
+    args = parse_args()
+    
     if args.debug:
         # Listen on port 5678
         debugpy.listen(5678)
         # The script is halted here, until a debugger is attached
         debugpy.wait_for_client()
-
-    args = parse_args()
 
     epochs = args.epochs
     learning_rate = args.learning_rate
