@@ -14,6 +14,7 @@ def parse_args():
     parser.add_argument('--learning_rate', type=float, default=0.01)
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--dataset_name', type=str, default="all_harbors")
+    parser.add_argument('--debug', type=bool, default=False)
     return parser.parse_args()
 
 # Helper function to log training metrics
@@ -26,11 +27,11 @@ def log_metadata(epoch, logs):
     }))
 
 def main():
-    # Listen on port 5678
-    debugpy.listen(5678)
-
-    # The script is halted here, until a debugger is attached
-    debugpy.wait_for_client()
+    if args.debug:
+        # Listen on port 5678
+        debugpy.listen(5678)
+        # The script is halted here, until a debugger is attached
+        debugpy.wait_for_client()
 
     args = parse_args()
 
