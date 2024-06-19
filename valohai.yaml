@@ -1,7 +1,21 @@
 - step:
+    name: myjob
+    image: docker.io/valohai/harbor-cv:0.21
+    #image: us-central1-docker.pkg.dev/cohesive-slate-192913/valohai/harbor-cv:0.21
+    #image: 905675611115.dkr.ecr.eu-west-1.amazonaws.com/valohai/harbor-cv:0.21
+    command:
+    - python train.py
+    # pip install
+    # conda install
+    # poetry install
+    # - apt-get install -y package
+    # mkdir something
+    # ./setup.sh
+    
+- step:
     name: preprocess-dataset
     image: docker.io/noorai/dynamic-pipelines-demo:0.1
-    environment: staging-aws-eu-west-1-g4dn-xlarge
+    environment: aws-eu-west-1-g4dn-xlarge
     command:
     - python ./preprocess.py
     inputs:
@@ -23,8 +37,10 @@
 - step:
     name: train-model
     image: docker.io/noorai/dynamic-pipelines-demo:0.1
-    environment: staging-aws-eu-west-1-g4dn-xlarge
+    environment: aws-eu-west-1-g4dn-xlarge
+    #environment: valohai-dev-debug
     command:
+    - pip install debugpy
     - python ./train_model.py {parameters}
     parameters:
       - name: epochs
@@ -37,16 +53,17 @@
         default: 64
         type: integer
       - name: dataset_name
-        optional: true
+        default: all_harbors
     inputs:
       - name: dataset
         default: dataset://{parameter:dataset_name}_train/latest
         optional: true
+        filename: preprocessed_data.npz
 
 - step:
     name: predict
     image: docker.io/noorai/dynamic-pipelines-demo:0.1
-    environment: staging-aws-eu-west-1-g4dn-xlarge
+    environment: aws-eu-west-1-g4dn-xlarge
     command:
     - python ./predict.py
     parameters:

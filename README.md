@@ -137,17 +137,17 @@ Generate temporary credentials using the AWS Security Token Service (STS) and co
 
 ### Preprocessing
 ```bash
-python preprocessing.py --csv_path data/raw/labels.csv --images_path data/raw/images.zip --output_path data/processed/dataset.npz
+python preprocess.py --csv_path data/raw/labels.csv --images_path data/raw/images.zip --output_path data/processed/dataset.npz
 ```
 
 ### Training
 ```bash
-python training.py --input_path data/processed/dataset.npz --epochs 50 --learning_rate 0.001 --batch_size 32 --dataset_name harbor_dataset
+python train_model.py --input_path data/processed/dataset.npz --epochs 50 --learning_rate 0.001 --batch_size 32 --dataset_name harbor_dataset
 ```
 
 ### Prediction
 ```bash
-python prediction.py --model_path models/harbor_model.h5 --test_data data/processed/dataset_test.npz --output_path predictions/
+python predict.py --model_path models/harbor_model.h5 --test_data data/processed/dataset_test.npz --output_path predictions/
 ```
 
 ## Save Artifacts to S3 via MLFlow
@@ -192,15 +192,15 @@ python prediction.py --model_path models/harbor_model.h5 --test_data data/proces
 
     def preprocess():
         import subprocess
-        subprocess.run(["python", "preprocessing.py", "--csv_path", "/path/to/labels.csv", "--images_path", "/path/to/images.zip", "--output_path", "data/processed/dataset.npz"])
+        subprocess.run(["python", "preprocess.py", "--csv_path", "/path/to/labels.csv", "--images_path", "/path/to/images.zip", "--output_path", "data/processed/dataset.npz"])
 
     def train():
         import subprocess
-        subprocess.run(["python", "training.py", "--input_path", "data/processed/dataset.npz", "--epochs", "50", "--learning_rate", "0.001", "--batch_size", "32", "--dataset_name", "harbor_dataset"])
+        subprocess.run(["python", "train_model.py", "--input_path", "data/processed/dataset.npz", "--epochs", "50", "--learning_rate", "0.001", "--batch_size", "32", "--dataset_name", "harbor_dataset"])
 
     def predict():
         import subprocess
-        subprocess.run(["python", "prediction.py", "--model_path", "models/harbor_model.h5", "--test_data", "data/processed/dataset_test.npz", "--output_path", "predictions/"])
+        subprocess.run(["python", "predict.py", "--model_path", "models/harbor_model.h5", "--test_data", "data/processed/dataset_test.npz", "--output_path", "predictions/"])
 
     default_args = {
         'owner': 'airflow',
