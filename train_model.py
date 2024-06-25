@@ -7,7 +7,26 @@ from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
 
-print("important change")
+
+# Parameter
+# how do you parse config values / hyperparam
+# argparse
+# parsing from json/yaml
+# hydra file
+
+# Metrics at runtime
+# {"mymetric": "isgreat"}
+# {"accuracy": 0.123}
+
+# Data
+# save the query result / dataset as a file
+# /valohai/outputs/
+# -> uploads to the S3 storage that is defined for this project/jobtype
+
+# output -> input
+# /valohai/inputs/snowflakedata/stuff.ext
+
+
 
 # Parse the arguments
 def parse_args():
