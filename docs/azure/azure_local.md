@@ -140,4 +140,75 @@ with mlflow.start_run():
 
 ## Chaining jobs and pipelining
 
-To be added...
+## Airflow Pipeline
+
+![Airflow](../../images/airflow.png)
+
+1. **Install Airflow:**
+    ```bash
+    pipx install apache-airflow
+    ```
+
+2. **Create a DAG:**
+    ```python
+    from airflow import DAG
+    from airflow.operators.python_operator import PythonOperator
+    from datetime import datetime
+    import boto3
+    import os
+
+    def download_data():
+        s3 = boto3.client('s3')
+        s3.download_file('your-s3-bucket', 'data/raw/labels.csv', '/path/to/labels.csv')
+        s3.download_file('your-s3-bucket', 'data/raw/images.zip', '/path/to/images.zip')
+
+    def preprocess():
+        import subprocess
+        subprocess.run(["python", "preprocess.py", "--csv_path", "/path/to/labels.csv", "--images_path", "/path/to/images.zip", "--output_path", "data/processed/dataset.npz"])
+
+    def train():
+        import subprocess
+        subprocess.run(["python", "train_model.py", "--input_path", "data/processed/dataset.npz", "--epochs", "50", "--learning_rate", "0.001", "--batch_size", "32", "--dataset_name", "harbor_dataset"])
+
+    def predict():
+        import subprocess
+        subprocess.run(["python", "predict.py", "--model_path", "models/harbor_model.h5", "--test_data", "data/processed/dataset_test.npz", "--output_path", "predictions/"])
+
+    default_args = {
+        'owner': 'airflow',
+        'start_date': datetime(2023, 1, 1),
+        'retries': 1,
+    }
+
+    dag = DAG('harbor_detection_pipeline', default_args=default_args, schedule_interval='@daily')
+
+    download_task = PythonOperator(
+        task_id='download_data',
+        python_callable=download_data,
+        dag=dag,
+    )
+
+    preprocess_task = PythonOperator(
+        task_id='preprocess',
+        python_callable=preprocess,
+        dag=dag,
+    )
+
+    train_task = PythonOperator(
+        task_id='train',
+        python_callable=train,
+        dag=dag,
+    )
+
+    predict_task = PythonOperator(
+        task_id='predict',
+        python_callable=predict,
+        dag=dag,
+    )
+
+    download_task >> preprocess_task >> train_task >> predict_task
+    ```
+
+3. **Deploy the DAG:**
+    - Save the DAG file (e.g., `harbor_detection_dag.py`) to the Airflow DAGs folder.
+    - Start the Airflow web server and scheduler.
