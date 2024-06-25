@@ -31,6 +31,54 @@ To access the test dataset stored in an Azure Storage account, request access fr
     container_client = blob_service_client.get_container_client("your-container")
     ```
 
+### Setup MLFlow
+1. **Check for Existing MLFlow Server:**
+   Before setting up a new MLFlow server, check with your team if there is already a shared MLFlow server available.
+
+2. **Setup MLFlow Server on a Separate EC2 Instance:**
+
+    1. **Launch an EC2 Instance:**
+        - Choose an instance type (e.g., `t2.medium`).
+        - Configure security group and key pair.
+
+    2. **Connect to the Instance:**
+        ```bash
+        ssh -i "your-key-pair.pem" ec2-user@your-mlflow-instance-public-dns
+        ```
+
+    3. **Install Dependencies:**
+        ```bash
+        sudo yum install git -y
+        sudo yum install -y python3
+        pip3 install mlflow boto3
+        ```
+
+    4. **Clone the Repository (optional, if you want to manage from the same repo):**
+        ```bash
+        git clone https://github.com/your-username/harbor-object-detection.git
+        cd harbor-object-detection
+        ```
+
+    5. **Configure MLFlow Tracking:**
+
+        > Request seperate authentication credentials for this, so you're not passing your personal access keys!
+
+        ```bash
+        az account set --subscription <subscription>
+        az configure --defaults workspace=<workspace> group=<resource-group> location=<location>
+        az ml workspace show --query mlflow_tracking_uri
+        ```
+
+    6. **Start MLFlow Server:**
+        ```bash
+        mlflow server \
+          --backend-store-uri sqlite:///mlflow.db \
+          --default-artifact-root azure://your-azure-storage/mlflow/ \
+          --host 0.0.0.0
+        ```
+
+![MLFlow](../../images/mlflow.png)
+
 ### Provision a Virtual Machine
 1. **Launch a Virtual Machine:**
     - Choose a machine type with GPU (e.g., `Standard_NC6`).
@@ -78,11 +126,24 @@ python training.py --input_path data/processed/dataset.npz --epochs 50 --learnin
 python prediction.py --model_path models/harbor_model.h5 --test_data data/processed/dataset_test.npz --output_path predictions/
 ```
 
-## Keep track of metrics
+## Save Artifacts to S3 via MLFlow
+1. **Log Artifacts:**
+    ```python
+    import mlflow
+    import os
 
-Update your CSV file with your experiment information and metrics.
+    os.environ["AZURE_TENANT_ID"] = "<AZURE_TENANT_ID>"
+    os.environ["AZURE_CLIENT_ID"] = "<AZURE_CLIENT_ID>"
+    os.environ["AZURE_CLIENT_SECRET"] = "<AZURE_CLIENT_SECRET>"
 
-![CSV Experiment Tracking](../../images/csv.png)
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    with mlflow.start_run():
+        mlflow.log_param("epochs", 50)
+        mlflow.log_param("learning_rate", 0.001)
+        mlflow.log_artifact("models/harbor_model.h5")
+        mlflow.log_artifact("predictions/")
+    ```
 
 ## Chaining jobs and pipelining
 
