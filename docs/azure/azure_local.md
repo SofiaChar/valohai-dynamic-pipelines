@@ -35,41 +35,25 @@ To access the test dataset stored in an Azure Storage account, request access fr
 1. **Check for Existing MLFlow Server:**
    Before setting up a new MLFlow server, check with your team if there is already a shared MLFlow server available.
 
-2. **Setup MLFlow Server on a Separate EC2 Instance:**
+2. **Setup MLFlow Server on a Separate VM Instance:**
 
-    1. **Launch an EC2 Instance:**
-        - Choose an instance type (e.g., `t2.medium`).
+    1. **Launch an VM Instance:**
+        - Choose an instance type
         - Configure security group and key pair.
 
     2. **Connect to the Instance:**
         ```bash
-        ssh -i "your-key-pair.pem" ec2-user@your-mlflow-instance-public-dns
+        ssh -i "your-key-pair.pem" user@your-mlflow-instance-public-dns
         ```
 
     3. **Install Dependencies:**
         ```bash
         sudo yum install git -y
         sudo yum install -y python3
-        pip3 install mlflow boto3
+        pip3 install mlflow
         ```
 
-    4. **Clone the Repository (optional, if you want to manage from the same repo):**
-        ```bash
-        git clone https://github.com/your-username/harbor-object-detection.git
-        cd harbor-object-detection
-        ```
-
-    5. **Configure MLFlow Tracking:**
-
-        > Request seperate authentication credentials for this, so you're not passing your personal access keys!
-
-        ```bash
-        az account set --subscription <subscription>
-        az configure --defaults workspace=<workspace> group=<resource-group> location=<location>
-        az ml workspace show --query mlflow_tracking_uri
-        ```
-
-    6. **Start MLFlow Server:**
+    4. **Start MLFlow Server:**
         ```bash
         mlflow server \
           --backend-store-uri sqlite:///mlflow.db \
@@ -110,6 +94,15 @@ To access the test dataset stored in an Azure Storage account, request access fr
 ## Running the Project
 
 After you've SSH'd into the the machine and cloned your Git commit there, you can run your jobs.
+
+### Configure MLFlow Tracking:
+
+
+```bash
+az account set --subscription <subscription>
+az configure --defaults workspace=<workspace> group=<resource-group> location=<location>
+az ml workspace show --query mlflow_tracking_uri
+```
 
 ### Preprocessing
 ```bash
