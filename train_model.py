@@ -7,6 +7,22 @@ from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
 
+# 3 things to change
+
+# Parameter parsing
+# --args=1 (parse with argparse)
+# JSON / YAML
+
+# Metrics
+# {"mymetricname": value}
+
+# Data ingestion / Saving artifacts
+# /valohai/inputs/dataset/1.pkl
+# /valohai/inputs/dataset/2.csv
+# pd.read_csv('/valohai/inputs/dataset/2.csv')
+# save any files 
+# /valohai/outputs/model-files/..
+
 # Parse the arguments
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -44,6 +60,11 @@ def main():
     # Read the data
     print("Reading the data...")
 
+    # s3://mybucket/images/may/001.jpeg
+    # s3://mybucket/images/may/*.jpeg
+    # azure://blobstorage/images/may/*.jpeg
+
+    # /valohai/inputs/dataset/preprocessed_data.npz
     input_data_dir = os.getenv('VH_INPUTS_DIR', '.inputs')
     path_dataset = os.path.join(input_data_dir, 'dataset/preprocessed_data.npz')
 
