@@ -7,21 +7,7 @@ from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
 
-# 3 things to change
-
-# Parameter parsing
-# --args=1 (parse with argparse)
-# JSON / YAML
-
-# Metrics
-# {"mymetricname": value}
-
-# Data ingestion / Saving artifacts
-# /valohai/inputs/dataset/1.pkl
-# /valohai/inputs/dataset/2.csv
-# pd.read_csv('/valohai/inputs/dataset/2.csv')
-# save any files 
-# /valohai/outputs/model-files/..
+print("haha change")
 
 # Parse the arguments
 def parse_args():
