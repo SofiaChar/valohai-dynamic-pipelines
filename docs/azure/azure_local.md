@@ -119,24 +119,24 @@ python training.py --input_path data/processed/dataset.npz --epochs 50 --learnin
 python prediction.py --model_path models/harbor_model.h5 --test_data data/processed/dataset_test.npz --output_path predictions/
 ```
 
-## Save Artifacts to S3 via MLFlow
-1. **Log Artifacts:**
-    ```python
-    import mlflow
-    import os
+## Save Artifacts to Azure Blob Storage via MLFlow
 
-    os.environ["AZURE_TENANT_ID"] = "<AZURE_TENANT_ID>"
-    os.environ["AZURE_CLIENT_ID"] = "<AZURE_CLIENT_ID>"
-    os.environ["AZURE_CLIENT_SECRET"] = "<AZURE_CLIENT_SECRET>"
+```python
+import mlflow
+import os
 
-    mlflow.set_tracking_uri(mlflow_tracking_uri)
+os.environ["AZURE_TENANT_ID"] = "<AZURE_TENANT_ID>"
+os.environ["AZURE_CLIENT_ID"] = "<AZURE_CLIENT_ID>"
+os.environ["AZURE_CLIENT_SECRET"] = "<AZURE_CLIENT_SECRET>"
 
-    with mlflow.start_run():
-        mlflow.log_param("epochs", 50)
-        mlflow.log_param("learning_rate", 0.001)
-        mlflow.log_artifact("models/harbor_model.h5")
-        mlflow.log_artifact("predictions/")
-    ```
+mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+with mlflow.start_run():
+    mlflow.log_param("epochs", 50)
+    mlflow.log_param("learning_rate", 0.001)
+    mlflow.log_artifact("models/harbor_model.h5")
+    mlflow.log_artifact("predictions/")
+```
 
 ## Chaining jobs and pipelining
 
