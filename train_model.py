@@ -7,7 +7,7 @@ from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
 
-print("haha change")
+print("important change")
 
 # Parse the arguments
 def parse_args():
