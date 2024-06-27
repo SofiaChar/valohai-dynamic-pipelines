@@ -7,8 +7,6 @@ from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
 
-print("such a good change")
-
 # Parse the arguments
 def parse_args():
     parser = argparse.ArgumentParser()
