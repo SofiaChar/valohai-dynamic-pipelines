@@ -1,10 +1,10 @@
 - step:
     name: myjob
-    image: docker.io/valohai/harbor-cv:0.21
+    image: python:3.10
     #image: us-central1-docker.pkg.dev/cohesive-slate-192913/valohai/harbor-cv:0.21
     #image: 905675611115.dkr.ecr.eu-west-1.amazonaws.com/valohai/harbor-cv:0.21
     command:
-    - python train.py
+    - python hello.py
     # pip install
     # conda install
     # poetry install

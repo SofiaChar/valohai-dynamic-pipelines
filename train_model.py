@@ -7,6 +7,36 @@ from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
 
+
+# Migrate to Valohai:
+# 
+# Parameters:
+# Acces tracked configuration options and 
+# hyperparameter values in your code by
+# parsing command line arguments (argparse) --param1=123
+# or by pasing a JSON / YAML file that contains the values
+#
+# Metrics:
+# Valohai doesn't automatically generate metrics, that depends on your code.
+# Collect metrics from jobs by printing them as JSON:
+# {"accuracy": 0.23, "f1_score": value, "custom_metric": my_metric_value}
+# 
+# Read files:
+# Read data from object data stores
+# AWS S3, Azure Blob Storage, onprem S3, Google Cloud Bucket
+# Ingest files with s3:// or azure:// or gs://
+# or using Valohai dataset:// or model:// which points to a collection of files
+# 
+# In your code these files will be available in the local directory:
+# /valohai/inputs/
+# 
+# Save artifacts:
+# Any artificats (data files, images, csv files, parquet files, models, etc.)
+# Save to /valohai/outputs/ and Valohai will handle versioning and uploading
+#
+# Define a step in valohai.yaml
+#
+
 # Parse the arguments
 def parse_args():
     parser = argparse.ArgumentParser()
