@@ -6,13 +6,14 @@ from keras.models import Sequential
 from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
-
+import valohai
 
 # Migrate to Valohai:
 # 
 # Parameters:
 # Acces tracked configuration options and 
 # hyperparameter values in your code by
+
 # parsing command line arguments (argparse) --param1=123
 # or by pasing a JSON / YAML file that contains the values
 #
@@ -20,6 +21,7 @@ import debugpy
 # Valohai doesn't automatically generate metrics, that depends on your code.
 # Collect metrics from jobs by printing them as JSON:
 # {"accuracy": 0.23, "f1_score": value, "custom_metric": my_metric_value}
+
 # 
 # Read files:
 # Read data from object data stores
@@ -143,4 +145,5 @@ def main():
     print("Saved completed artefacts to outputs")
 
 if __name__ == '__main__':
+    print('Hello Valohai')
     main()
