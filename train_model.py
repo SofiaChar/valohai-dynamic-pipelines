@@ -145,5 +145,5 @@ def main():
     print("Saved completed artefacts to outputs")
 
 if __name__ == '__main__':
-    print('Hello Valohai')
+    print('Hello from local')
     main()
