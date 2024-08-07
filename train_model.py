@@ -138,6 +138,7 @@ def main():
 
     # Save the trained model
     print("Saving the trained model...")
+
     output_dir_path = os.getenv('VH_OUTPUTS_DIR', '.outputs')
     dataset_name = dataset_name
     output_path = os.path.join(output_dir_path, f"model-" + dataset_name + ".h5")
@@ -145,4 +146,5 @@ def main():
     print("Saved completed artefacts to outputs")
 
 if __name__ == '__main__':
+    print('Hello testing code')
     main()
