@@ -9,6 +9,8 @@ This project is designed to detect different types of ships and vessels from aer
 
 ## Setup Instructions
 
+![image](https://github.com/user-attachments/assets/5acfe587-3145-4412-bfb6-32cf83b18d51)
+
 ### Request Access to Azure Storage
 To access the test dataset stored in an Azure Storage account, request access from your Azure administrator. Generate temporary credentials using the Azure CLI and configure the Azure Storage client.
 
