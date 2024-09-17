@@ -6,7 +6,6 @@ from keras.models import Sequential
 from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 import tensorflow as tf
 import debugpy
-import valohai
 
 # Migrate to Valohai:
 # 
@@ -138,7 +137,7 @@ def main():
 
     # Save the trained model
     print("Saving the trained model...")
-
+    # /valohai/outputs/
     output_dir_path = os.getenv('VH_OUTPUTS_DIR', '.outputs')
     dataset_name = dataset_name
     output_path = os.path.join(output_dir_path, f"model-" + dataset_name + ".h5")
@@ -146,4 +145,5 @@ def main():
     print("Saved completed artefacts to outputs")
 
 if __name__ == '__main__':
+    print('Hello from local')
     main()
