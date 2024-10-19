@@ -70,7 +70,11 @@ for dataset in dataset_names:
     )
 
     metadata_train = {
-        "valohai.dataset-versions": ["dataset://" + dataset + "_train/" + exec_id]
+        "valohai.dataset-versions": ["dataset://" + dataset + "_train/" + exec_id],
+        # Define the properties for the data
+        "ship_type": "cargo",
+        "data_type": "binary_numpy",
+        "labels": "yes"
     }
 
     metadata_path = valohai.outputs("train").path(
