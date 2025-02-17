@@ -1,0 +1,21 @@
+{
+  "valohai.commit-identifier": "17aa47f06f60c678c78e4b4389a7d30838b04401",
+  "valohai.creator-email": "drazen@valohai.com",
+  "valohai.creator-id": 3323,
+  "valohai.creator-name": "sofiia",
+  "valohai.environment-id": "0167d05d-a1d7-cc02-8256-6455a6ecfa56",
+  "valohai.environment-name": "Microsoft Azure F2s v2 (No GPU)",
+  "valohai.environment-slug": "azure-westeurope-f2sv2",
+  "valohai.execution-counter": 5913,
+  "valohai.execution-ctime": "2023-09-18T19:52:29.081628+00:00",
+  "valohai.execution-duration": null,
+  "valohai.execution-id": "018aa9d9-f899-8e4b-80f9-464ea1c855eb",
+  "valohai.execution-image": "tensorflow/tensorflow:2.6.0",
+  "valohai.execution-qtime": null,
+  "valohai.execution-status": "created",
+  "valohai.execution-step": "train-model",
+  "valohai.execution-tags": [],
+  "valohai.execution-title": null,
+  "valohai.project-id": "01774560-c649-7f96-bd60-c81a1c210190",
+  "valohai.project-name": "Acne_Waver_Zombies/Zombie_MNIST"
+}

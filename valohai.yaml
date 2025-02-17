@@ -90,6 +90,7 @@
       keep-directories: "suffix"
 
 - pipeline:
+    reuse-executions: true
     name: training-pipeline
     parameters:
       - name: dataset
