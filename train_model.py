@@ -2,11 +2,15 @@ import os
 import json
 import argparse
 import numpy as np
-from keras.models import Sequential
-from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
-import tensorflow as tf
 import debugpy
+import tensorflow as tf
+from tensorflow.keras import Sequential, Input
+from tensorflow.keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPool2D
 
+import tensorflow as tf
+print("TF:", tf.__version__)
+print("CUDA built:", tf.test.is_built_with_cuda())
+print("GPU:", tf.config.list_physical_devices("GPU"))
 # Migrate to Valohai:
 # 
 # Parameters:
@@ -90,6 +94,7 @@ def main():
     print("Starting the model training...")
 
     model = Sequential()
+    model.add(Input(shape=(150, 150, 3)),)
     model.add(
         Conv2D(
             32,
@@ -97,7 +102,6 @@ def main():
             activation="relu",
             kernel_regularizer=None,
             padding="same",
-            input_shape=(150, 150, 3),
         )
     )
     model.add(MaxPool2D((2, 2), strides=(2, 2), padding="same"))
@@ -123,6 +127,7 @@ def main():
         x_train,
         y_train,
         epochs=epochs,
+        batch_size=batch_size,
         callbacks=[callback],
     )
 

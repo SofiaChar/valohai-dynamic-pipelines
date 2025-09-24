@@ -22,14 +22,21 @@
 - step:
     name: preprocess-dataset
     image: docker.io/noorai/dynamic-pipelines-demo:0.1
-    environment: aws-eu-west-1-g4dn-xlarge
+    environment: nebius-cluster
+    resources:
+      cpu:
+        min: 1
+        max: 2
+      memory:
+        min: 500
+        max: 1000
     command:
     - python ./preprocess.py
     inputs:
       - name: dataset
         default: s3://valohai-demo-library-data/dynamic-pipelines/train/images.zip
       - name: labels
-        default: s3://valohai-demo-library-data/dynamic-pipelines/train/*.csv 
+        default: s3://valohai-demo-library-data/dynamic-pipelines/train/*.csv
     parameters:
         - name: dataset_names
           default: [harbor_A]
@@ -43,9 +50,17 @@
 
 - step:
     name: train-model
-    image: docker.io/noorai/dynamic-pipelines-demo:0.1
-    environment: aws-eu-west-1-g4dn-xlarge
-    #environment: valohai-dev-debug
+    image: tensorflow/tensorflow:2.16.2-gpu
+    environment: nebius-cluster
+    resources:
+      cpu:
+        min: 1
+        max: 4
+      memory:
+        min: 500
+        max: 4000
+      devices:
+        nvidia.com/gpu: 1
     command:
     - pip install debugpy
     - python ./train_model.py {parameters}
@@ -60,7 +75,7 @@
         default: 64
         type: integer
       - name: dataset_name
-        default: all_harbors
+        default: harbor_A
       - name: debug
         type: flag
         default: false
@@ -74,7 +89,14 @@
 - step:
     name: predict
     image: docker.io/noorai/dynamic-pipelines-demo:0.1
-    environment: aws-eu-west-1-g4dn-xlarge
+    environment: nebius-cluster
+    resources:
+      cpu:
+        min: 1
+        max: 2
+      memory:
+        min: 500
+        max: 1000
     command:
     - python ./predict.py
     parameters:
