@@ -29,7 +29,7 @@
         max: 2
       memory:
         min: 500
-        max: 1000
+        max: 4000
     command:
     - python ./preprocess.py
     inputs:
@@ -96,7 +96,7 @@
         max: 2
       memory:
         min: 500
-        max: 1000
+        max: 4000
     command:
     - python ./predict.py
     parameters:
